@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import Link from 'next/link'
-import { BookOpen, Target, Trophy, Clock, TrendingUp, GraduationCap } from 'lucide-react'
+import { BookOpen, Target, Trophy, Clock, TrendingUp, GraduationCap, Languages } from 'lucide-react'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -101,12 +101,20 @@ export default async function DashboardPage() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-foreground">Idiomas Disponiveis</h2>
-          <Link href="/dashboard/treinar">
-            <Button variant="outline" size="sm" className="gap-2">
-              <GraduationCap className="w-4 h-4" />
-              Comecar Treino
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/dashboard/tradutor">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Languages className="w-4 h-4" />
+                Traduzir Palavra
+              </Button>
+            </Link>
+            <Link href="/dashboard/treinar">
+              <Button variant="outline" size="sm" className="gap-2">
+                <GraduationCap className="w-4 h-4" />
+                Comecar Treino
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {languages && languages.length > 0 ? (

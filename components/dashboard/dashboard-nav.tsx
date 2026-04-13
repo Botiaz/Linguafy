@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { BookOpen, LayoutDashboard, GraduationCap, Settings, LogOut, Shield } from 'lucide-react'
+import { BookOpen, LayoutDashboard, GraduationCap, Languages, Settings, LogOut, Shield } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 import type { Profile } from '@/lib/types'
 
@@ -34,6 +34,7 @@ export function DashboardNav({ user, profile }: DashboardNavProps) {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/dashboard/tradutor', label: 'Tradutor', icon: Languages },
     { href: '/dashboard/treinar', label: 'Treinar', icon: GraduationCap },
   ]
 
@@ -105,6 +106,12 @@ export function DashboardNav({ user, profile }: DashboardNavProps) {
               <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer">
                 <LayoutDashboard className="w-4 h-4" />
                 Dashboard
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/tradutor" className="flex items-center gap-2 cursor-pointer">
+                <Languages className="w-4 h-4" />
+                Tradutor
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>

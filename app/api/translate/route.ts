@@ -1,43 +1,117 @@
 'use server'
 
-import { generateText, Output } from 'ai'
-import { z } from 'zod'
+import * as deepl from 'deepl-node'
 import { createClient } from '@/lib/supabase/server'
+
+const deeplAuthKey = process.env.DEEPL_AUTH_KEY
+const deeplServerUrl = process.env.DEEPL_SERVER_URL
+
+function createTranslator() {
+  if (!deeplAuthKey) {
+    throw new Error('DEEPL_AUTH_KEY nao configurada no servidor')
+  }
+
+  const translatorOptions = deeplServerUrl
+    ? { serverUrl: deeplServerUrl }
+    : deeplAuthKey.endsWith(':fx')
+      ? { serverUrl: 'https://api-free.deepl.com' }
+      : undefined
+
+  return new deepl.Translator(deeplAuthKey, translatorOptions)
+}
+
+function toDeepLTargetLang(languageCode: string) {
+  const normalized = languageCode.trim().toLowerCase()
+
+  if (normalized === 'en') return 'EN-US'
+  if (normalized === 'pt') return 'PT-BR'
+
+  return normalized.toUpperCase()
+}
+
+function toDeepLSourceLang(languageCode?: string) {
+  if (!languageCode) return null
+
+  const normalized = languageCode.trim().toLowerCase()
+  if (!normalized) return null
+
+  if (normalized === 'en-us' || normalized === 'en-gb') return 'EN'
+  if (normalized === 'pt-br' || normalized === 'pt-pt') return 'PT'
+
+  return normalized.split('-')[0].toUpperCase()
+}
+
+export async function GET() {
+  try {
+    const translator = createTranslator()
+    const [targetLanguages, sourceLanguages] = await Promise.all([
+      translator.getTargetLanguages(),
+      translator.getSourceLanguages(),
+    ])
+
+    return Response.json({
+      success: true,
+      provider: 'deepl',
+      languages: {
+        target: targetLanguages.map((language) => ({
+          code: language.code,
+          name: language.name,
+          supportsFormality: language.supportsFormality,
+        })),
+        source: sourceLanguages.map((language) => ({
+          code: language.code,
+          name: language.name,
+        })),
+      },
+    })
+  } catch (error) {
+    console.error('Erro ao buscar idiomas DeepL:', error)
+    return Response.json(
+      { error: 'Nao foi possivel carregar idiomas da DeepL' },
+      { status: 500 }
+    )
+  }
+}
+
 
 export async function POST(req: Request) {
   try {
-    const { word, sourceLanguage, targetLanguageId, targetLanguageName, userId } = await req.json()
+    const {
+      word,
+      sourceLanguage,
+      sourceLanguageCode,
+      targetLanguageId,
+      targetLanguageName,
+      targetLanguageCode,
+      userId,
+    } = await req.json()
 
-    if (!word || !sourceLanguage || !targetLanguageId || !targetLanguageName) {
+    if (!word || !targetLanguageId || !targetLanguageName || !targetLanguageCode) {
       return Response.json(
         { error: 'Campos obrigatorios ausentes' },
         { status: 400 }
       )
     }
 
-    // Traduzir usando AI
-    const result = await generateText({
-      model: 'openai/gpt-4o-mini',
-      output: Output.object({
-        schema: z.object({
-          translatedWord: z.string().describe('A palavra traduzida'),
-          pronunciation: z.string().nullable().describe('Pronuncia fonetica da palavra traduzida'),
-          exampleSentence: z.string().nullable().describe('Uma frase de exemplo usando a palavra traduzida'),
-          exampleTranslation: z.string().nullable().describe('Traducao da frase de exemplo'),
-        }),
-      }),
-      prompt: `Traduza a seguinte palavra de ${sourceLanguage} para ${targetLanguageName}.
+    const translator = createTranslator()
 
-Palavra: "${word}"
+    const deepLTargetLang = toDeepLTargetLang(targetLanguageCode)
+    const deepLSourceLang = toDeepLSourceLang(sourceLanguageCode)
 
-Responda com:
-1. A traducao exata da palavra
-2. A pronuncia fonetica (se aplicavel)
-3. Uma frase de exemplo usando a palavra traduzida
-4. A traducao da frase de exemplo para ${sourceLanguage}`,
-    })
+    const result = await translator.translateText(
+      word,
+      deepLSourceLang as deepl.SourceLanguageCode | null,
+      deepLTargetLang as deepl.TargetLanguageCode
+    )
 
-    const translation = result.output
+    const translatedText = Array.isArray(result) ? result[0]?.text : result.text
+
+    const translation = {
+      translatedWord: translatedText,
+      pronunciation: null,
+      exampleSentence: null,
+      exampleTranslation: null,
+    }
 
     if (!translation || !translation.translatedWord) {
       return Response.json(
@@ -101,21 +175,33 @@ Responda com:
           console.error('Erro ao salvar palavra:', insertError)
         } else {
           savedWord = newWord
+        }
+      } else {
+        savedWord = existingWord
+      }
 
-          // Adicionar ao vocabulario do usuario para treino
+      // Garantir que a palavra traduzida esteja disponivel para treino
+      if (savedWord?.id) {
+        const { data: existingVocabulary } = await supabase
+          .from('user_vocabulary')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('word_id', savedWord.id)
+          .maybeSingle()
+
+        if (!existingVocabulary) {
           await supabase
             .from('user_vocabulary')
             .insert({
               user_id: userId,
-              word_id: newWord.id,
-              confidence_level: 0,
-              times_practiced: 0,
+              word_id: savedWord.id,
+              mastery_level: 0,
+              times_reviewed: 0,
               times_correct: 0,
+              last_reviewed: null,
+              next_review: new Date().toISOString(),
             })
-            .select()
         }
-      } else {
-        savedWord = existingWord
       }
     }
 
@@ -127,6 +213,11 @@ Responda com:
         pronunciation: translation.pronunciation,
         exampleSentence: translation.exampleSentence,
         exampleTranslation: translation.exampleTranslation,
+      },
+      metadata: {
+        provider: 'deepl',
+        sourceLanguage: sourceLanguage || sourceLanguageCode || 'auto',
+        targetLanguage: targetLanguageName,
       },
       saved: !!savedWord,
       wordId: savedWord?.id,

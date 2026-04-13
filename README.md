@@ -2,7 +2,7 @@
 
 Aplicacao web para aprendizado de idiomas com foco em flashcards, repeticao espacada e acompanhamento de progresso.
 
-O projeto usa Next.js (App Router), Supabase para autenticacao e banco de dados, e uma rota de API para traducao assistida por IA.
+O projeto usa Next.js (App Router), Supabase para autenticacao e banco de dados, e uma rota de API para traducao com DeepL.
 
 ## Funcionalidades
 
@@ -20,7 +20,7 @@ O projeto usa Next.js (App Router), Supabase para autenticacao e banco de dados,
 - Tailwind CSS 4
 - shadcn/ui + Radix UI
 - Supabase (Auth + Postgres + RLS)
-- Vercel AI SDK (rota de traducao)
+- DeepL API (rota de traducao)
 
 ## Requisitos
 
@@ -42,6 +42,9 @@ pnpm install
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=http://localhost:3000/dashboard
+DEEPL_AUTH_KEY=
+# Opcional (para conta free, se necessario)
+# DEEPL_SERVER_URL=https://api-free.deepl.com
 ```
 
 3. Configure o banco no Supabase (SQL Editor):

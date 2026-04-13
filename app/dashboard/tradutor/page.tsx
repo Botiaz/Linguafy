@@ -23,7 +23,7 @@ export default async function TradutorPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Tradutor</h1>
         <p className="text-muted-foreground">
-          Traduza palavras e salve automaticamente para treinar depois
+          Traduza com DeepL e salve automaticamente para treinar depois
         </p>
       </div>
 
