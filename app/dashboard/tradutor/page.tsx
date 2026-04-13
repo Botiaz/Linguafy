@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { TranslatorInterface } from '@/components/translator/translator-interface'
+import { TranslatorInterface } from '../../../components/translator/translator-interface'
 
 export default async function TradutorPage() {
   const supabase = await createClient()
@@ -12,10 +12,9 @@ export default async function TradutorPage() {
   }
 
   // Buscar idiomas disponiveis
-  const { data: languages } = await supabase
+  const { data: languages, error: languagesError } = await supabase
     .from('languages')
     .select('*')
-    .eq('is_active', true)
     .order('name')
 
   return (
@@ -25,6 +24,11 @@ export default async function TradutorPage() {
         <p className="text-muted-foreground">
           Traduza com DeepL e salve automaticamente para treinar depois
         </p>
+        {languagesError ? (
+          <p className="text-amber-600 mt-2 text-sm">
+            Aviso: nao foi possivel carregar idiomas do banco, usando lista da DeepL.
+          </p>
+        ) : null}
       </div>
 
       <TranslatorInterface 

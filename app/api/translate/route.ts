@@ -41,6 +41,15 @@ function toDeepLSourceLang(languageCode?: string) {
   return normalized.split('-')[0].toUpperCase()
 }
 
+function isUuid(value?: string) {
+  if (!value) return false
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+function normalizeLanguageCodeForStorage(languageCode: string) {
+  return languageCode.trim().toLowerCase().split('-')[0]
+}
+
 export async function GET() {
   try {
     const translator = createTranslator()
@@ -86,7 +95,7 @@ export async function POST(req: Request) {
       userId,
     } = await req.json()
 
-    if (!word || !targetLanguageId || !targetLanguageName || !targetLanguageCode) {
+    if (!word || !targetLanguageName || !targetLanguageCode) {
       return Response.json(
         { error: 'Campos obrigatorios ausentes' },
         { status: 400 }
@@ -123,85 +132,118 @@ export async function POST(req: Request) {
     // Salvar no banco de dados se o usuario estiver autenticado
     let savedWord = null
     if (userId) {
-      const supabase = await createClient()
+      try {
+        const supabase = await createClient()
+        let languageIdToUse = isUuid(targetLanguageId) ? targetLanguageId : null
 
-      // Verificar se a palavra ja existe para este idioma
-      const { data: existingWord } = await supabase
-        .from('words')
-        .select('id')
-        .eq('original_word', word.toLowerCase())
-        .eq('translated_word', translation.translatedWord.toLowerCase())
-        .eq('language_id', targetLanguageId)
-        .single()
+        if (!languageIdToUse) {
+          const normalizedCode = normalizeLanguageCodeForStorage(targetLanguageCode)
 
-      if (!existingWord) {
-        // Buscar ou criar categoria "Tradutor"
-        let { data: category } = await supabase
-          .from('categories')
-          .select('id')
-          .eq('name', 'Tradutor')
-          .eq('language_id', targetLanguageId)
-          .single()
-
-        if (!category) {
-          const { data: newCategory } = await supabase
-            .from('categories')
-            .insert({
-              name: 'Tradutor',
-              language_id: targetLanguageId,
-              description: 'Palavras adicionadas pelo tradutor automatico',
-            })
+          const { data: existingLanguage } = await supabase
+            .from('languages')
             .select('id')
-            .single()
-          category = newCategory
+            .ilike('code', normalizedCode)
+            .maybeSingle()
+
+          if (existingLanguage?.id) {
+            languageIdToUse = existingLanguage.id
+          } else {
+            const { data: createdLanguage } = await supabase
+              .from('languages')
+              .insert({
+                name: targetLanguageName,
+                code: normalizedCode,
+                flag_emoji: '🌐',
+              })
+              .select('id')
+              .single()
+
+            languageIdToUse = createdLanguage?.id || null
+          }
         }
 
-        // Inserir a nova palavra
-        const { data: newWord, error: insertError } = await supabase
-          .from('words')
-          .insert({
-            original_word: word.toLowerCase(),
-            translated_word: translation.translatedWord.toLowerCase(),
-            language_id: targetLanguageId,
-            category_id: category?.id,
-            pronunciation: translation.pronunciation,
-            example_sentence: translation.exampleSentence,
-            example_translation: translation.exampleTranslation,
-          })
-          .select()
-          .single()
+        if (languageIdToUse) {
+          // Verificar se a palavra ja existe para este idioma
+          const { data: existingWord } = await supabase
+            .from('words')
+            .select('id')
+            .eq('original_word', word.toLowerCase())
+            .eq('translated_word', translation.translatedWord.toLowerCase())
+            .eq('language_id', languageIdToUse)
+            .maybeSingle()
 
-        if (insertError) {
-          console.error('Erro ao salvar palavra:', insertError)
-        } else {
-          savedWord = newWord
+          if (!existingWord) {
+            // Buscar ou criar categoria "Tradutor"
+            let { data: category } = await supabase
+              .from('categories')
+              .select('id')
+              .eq('name', 'Tradutor')
+              .eq('language_id', languageIdToUse)
+              .maybeSingle()
+
+            if (!category) {
+              const { data: newCategory } = await supabase
+                .from('categories')
+                .insert({
+                  name: 'Tradutor',
+                  language_id: languageIdToUse,
+                  description: 'Palavras adicionadas pelo tradutor automatico',
+                })
+                .select('id')
+                .single()
+              category = newCategory
+            }
+
+            // Inserir a nova palavra
+            const { data: newWord, error: insertError } = await supabase
+              .from('words')
+              .insert({
+                original_word: word.toLowerCase(),
+                translated_word: translation.translatedWord.toLowerCase(),
+                language_id: languageIdToUse,
+                category_id: category?.id,
+                pronunciation: translation.pronunciation,
+                example_sentence: translation.exampleSentence,
+                example_translation: translation.exampleTranslation,
+              })
+              .select()
+              .single()
+
+            if (insertError) {
+              console.error('Erro ao salvar palavra:', insertError)
+            } else {
+              savedWord = newWord
+            }
+          } else {
+            savedWord = existingWord
+          }
+
+          // Garantir que a palavra traduzida esteja disponivel para treino
+          if (savedWord?.id) {
+            const { data: existingVocabulary } = await supabase
+              .from('user_vocabulary')
+              .select('id')
+              .eq('user_id', userId)
+              .eq('word_id', savedWord.id)
+              .maybeSingle()
+
+            if (!existingVocabulary) {
+              await supabase
+                .from('user_vocabulary')
+                .insert({
+                  user_id: userId,
+                  word_id: savedWord.id,
+                  mastery_level: 0,
+                  times_reviewed: 0,
+                  times_correct: 0,
+                  last_reviewed: null,
+                  next_review: new Date().toISOString(),
+                })
+            }
+          }
         }
-      } else {
-        savedWord = existingWord
-      }
-
-      // Garantir que a palavra traduzida esteja disponivel para treino
-      if (savedWord?.id) {
-        const { data: existingVocabulary } = await supabase
-          .from('user_vocabulary')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('word_id', savedWord.id)
-          .maybeSingle()
-
-        if (!existingVocabulary) {
-          await supabase
-            .from('user_vocabulary')
-            .insert({
-              user_id: userId,
-              word_id: savedWord.id,
-              mastery_level: 0,
-              times_reviewed: 0,
-              times_correct: 0,
-              last_reviewed: null,
-              next_review: new Date().toISOString(),
-            })
-        }
+      } catch (databaseError) {
+        console.error('Erro ao salvar traducao para treino:', databaseError)
       }
     }
 

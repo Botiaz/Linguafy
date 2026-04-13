@@ -44,6 +44,14 @@ interface DeepLLanguagesResponse {
   }
 }
 
+interface LanguageOption {
+  id: string
+  name: string
+  code: string
+  flag_emoji: string
+  databaseId?: string
+}
+
 export function TranslatorInterface({ languages, userId }: TranslatorInterfaceProps) {
   const [word, setWord] = useState('')
   const [sourceLanguageId, setSourceLanguageId] = useState('')
@@ -52,6 +60,8 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
   const [result, setResult] = useState<TranslationResponse | null>(null)
   const [supportedSourceCodes, setSupportedSourceCodes] = useState<string[]>([])
   const [supportedTargetCodes, setSupportedTargetCodes] = useState<string[]>([])
+  const [deepLSourceLanguages, setDeepLSourceLanguages] = useState<{ code: string; name: string }[]>([])
+  const [deepLTargetLanguages, setDeepLTargetLanguages] = useState<{ code: string; name: string }[]>([])
 
   useEffect(() => {
     let isMounted = true
@@ -67,6 +77,8 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
         const sourceCodes = payload.languages.source.map((item) => item.code.toLowerCase())
         const targetCodes = payload.languages.target.map((item) => item.code.toLowerCase())
 
+        setDeepLSourceLanguages(payload.languages.source)
+        setDeepLTargetLanguages(payload.languages.target)
         setSupportedSourceCodes(sourceCodes)
         setSupportedTargetCodes(targetCodes)
       } catch {
@@ -81,32 +93,66 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
     }
   }, [])
 
-  const sourceLanguages = useMemo(() => {
-    if (supportedSourceCodes.length === 0) return languages
+  const dbLanguageOptions = useMemo<LanguageOption[]>(() => {
+    return languages.map((language) => ({
+      id: language.id,
+      databaseId: language.id,
+      name: language.name,
+      code: language.code,
+      flag_emoji: language.flag_emoji || '🌐',
+    }))
+  }, [languages])
 
-    return languages.filter((language) => {
+  const deepLSourceOptions = useMemo<LanguageOption[]>(() => {
+    return deepLSourceLanguages.map((language) => ({
+      id: `deepl-source-${language.code}`,
+      name: language.name,
+      code: language.code,
+      flag_emoji: '🌐',
+    }))
+  }, [deepLSourceLanguages])
+
+  const deepLTargetOptions = useMemo<LanguageOption[]>(() => {
+    return deepLTargetLanguages.map((language) => ({
+      id: `deepl-target-${language.code}`,
+      name: language.name,
+      code: language.code,
+      flag_emoji: '🌐',
+    }))
+  }, [deepLTargetLanguages])
+
+  const sourceLanguages = useMemo(() => {
+    if (dbLanguageOptions.length === 0) return deepLSourceOptions
+    if (supportedSourceCodes.length === 0) return dbLanguageOptions
+
+    const filtered = dbLanguageOptions.filter((language) => {
       const code = language.code.toLowerCase()
       return supportedSourceCodes.includes(code) || supportedSourceCodes.includes(code.split('-')[0])
     })
-  }, [languages, supportedSourceCodes])
+
+    return filtered.length > 0 ? filtered : deepLSourceOptions
+  }, [dbLanguageOptions, deepLSourceOptions, supportedSourceCodes])
 
   const targetLanguages = useMemo(() => {
-    if (supportedTargetCodes.length === 0) return languages
+    if (dbLanguageOptions.length === 0) return deepLTargetOptions
+    if (supportedTargetCodes.length === 0) return dbLanguageOptions
 
-    return languages.filter((language) => {
+    const filtered = dbLanguageOptions.filter((language) => {
       const code = language.code.toLowerCase()
       return supportedTargetCodes.includes(code) || supportedTargetCodes.includes(code.split('-')[0])
     })
-  }, [languages, supportedTargetCodes])
+
+    return filtered.length > 0 ? filtered : deepLTargetOptions
+  }, [dbLanguageOptions, deepLTargetOptions, supportedTargetCodes])
 
   const sourceLanguage = useMemo(
-    () => languages.find((language) => language.id === sourceLanguageId),
-    [languages, sourceLanguageId]
+    () => sourceLanguages.find((language) => language.id === sourceLanguageId),
+    [sourceLanguages, sourceLanguageId]
   )
 
   const targetLanguage = useMemo(
-    () => languages.find((language) => language.id === targetLanguageId),
-    [languages, targetLanguageId]
+    () => targetLanguages.find((language) => language.id === targetLanguageId),
+    [targetLanguages, targetLanguageId]
   )
 
   async function handleTranslate() {
@@ -137,7 +183,7 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
           word: word.trim(),
           sourceLanguage: sourceLanguage.name,
           sourceLanguageCode: sourceLanguage.code,
-          targetLanguageId: targetLanguage.id,
+          targetLanguageId: targetLanguage.databaseId,
           targetLanguageName: targetLanguage.name,
           targetLanguageCode: targetLanguage.code,
           userId,
@@ -217,6 +263,12 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
               </Select>
             </div>
           </div>
+
+          {sourceLanguages.length === 0 || targetLanguages.length === 0 ? (
+            <p className="text-sm text-amber-600">
+              Nao foi possivel carregar idiomas. Verifique DEEPL_AUTH_KEY e a conexao com o Supabase.
+            </p>
+          ) : null}
 
           <div className="space-y-2">
             <Label htmlFor="word">Palavra</Label>

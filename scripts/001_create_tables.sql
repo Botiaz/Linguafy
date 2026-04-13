@@ -162,6 +162,7 @@ CREATE TRIGGER on_auth_user_created
 -- Inserir idiomas iniciais
 INSERT INTO public.languages (name, code, flag) VALUES
   ('Inglês', 'en', '🇺🇸'),
+  ('Português', 'pt', '🇧🇷'),
   ('Espanhol', 'es', '🇪🇸'),
   ('Francês', 'fr', '🇫🇷'),
   ('Alemão', 'de', '🇩🇪'),
