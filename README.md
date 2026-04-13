@@ -1,4 +1,4 @@
-# Linguafy (LinguaFlash)
+# Linguafy
 
 Aplicacao web para aprendizado de idiomas com foco em flashcards, repeticao espacada e acompanhamento de progresso.
 
