@@ -6,11 +6,14 @@ import { Languages, Loader2, Save, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Language } from '@/lib/types'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+const INVALID_WORD_MESSAGE = 'Nao foi possivel validar essa palavra para traducao. Tente outra palavra existente.'
 
 interface TranslatorInterfaceProps {
   languages: Language[]
@@ -52,6 +55,23 @@ interface LanguageOption {
   databaseId?: string
 }
 
+function matchesSupportedLanguage(code: string, supportedCodes: string[]) {
+  const normalizedCode = code.toLowerCase()
+  const baseCode = normalizedCode.split('-')[0]
+
+  return supportedCodes.some((supportedCode) => {
+    const normalizedSupported = supportedCode.toLowerCase()
+    const supportedBase = normalizedSupported.split('-')[0]
+
+    return (
+      normalizedSupported === normalizedCode ||
+      supportedBase === baseCode ||
+      normalizedSupported.startsWith(`${baseCode}-`) ||
+      normalizedCode.startsWith(`${supportedBase}-`)
+    )
+  })
+}
+
 export function TranslatorInterface({ languages, userId }: TranslatorInterfaceProps) {
   const [word, setWord] = useState('')
   const [sourceLanguageId, setSourceLanguageId] = useState('')
@@ -62,6 +82,8 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
   const [supportedTargetCodes, setSupportedTargetCodes] = useState<string[]>([])
   const [deepLSourceLanguages, setDeepLSourceLanguages] = useState<{ code: string; name: string }[]>([])
   const [deepLTargetLanguages, setDeepLTargetLanguages] = useState<{ code: string; name: string }[]>([])
+  const [lastSourceLanguage, setLastSourceLanguage] = useState<LanguageOption | null>(null)
+  const [highlightedError, setHighlightedError] = useState<string | null>(null)
 
   useEffect(() => {
     let isMounted = true
@@ -126,8 +148,7 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
     if (supportedSourceCodes.length === 0) return dbLanguageOptions
 
     const filtered = dbLanguageOptions.filter((language) => {
-      const code = language.code.toLowerCase()
-      return supportedSourceCodes.includes(code) || supportedSourceCodes.includes(code.split('-')[0])
+      return matchesSupportedLanguage(language.code, supportedSourceCodes)
     })
 
     return filtered.length > 0 ? filtered : deepLSourceOptions
@@ -138,8 +159,7 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
     if (supportedTargetCodes.length === 0) return dbLanguageOptions
 
     const filtered = dbLanguageOptions.filter((language) => {
-      const code = language.code.toLowerCase()
-      return supportedTargetCodes.includes(code) || supportedTargetCodes.includes(code.split('-')[0])
+      return matchesSupportedLanguage(language.code, supportedTargetCodes)
     })
 
     return filtered.length > 0 ? filtered : deepLTargetOptions
@@ -155,7 +175,20 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
     [targetLanguages, targetLanguageId]
   )
 
+  const trainingHref = useMemo(() => {
+    if (!lastSourceLanguage) return '/dashboard/treinar'
+
+    if (lastSourceLanguage.databaseId) {
+      return `/dashboard/treinar?language=${lastSourceLanguage.databaseId}`
+    }
+
+    const params = new URLSearchParams({ sourceCode: lastSourceLanguage.code })
+    return `/dashboard/treinar?${params.toString()}`
+  }, [lastSourceLanguage])
+
   async function handleTranslate() {
+    setHighlightedError(null)
+
     if (!word.trim()) {
       toast.error('Digite uma palavra para traduzir')
       return
@@ -171,6 +204,7 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
       return
     }
 
+    const sourceForTraining = sourceLanguage
     setIsTranslating(true)
 
     try {
@@ -196,10 +230,17 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
         throw new Error(payload.error || 'Nao foi possivel traduzir a palavra')
       }
 
+      setLastSourceLanguage(sourceForTraining)
       setResult(payload)
+      setHighlightedError(null)
       toast.success('Traducao concluida e salva para treino')
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Erro ao traduzir palavra'
+
+      if (message === INVALID_WORD_MESSAGE) {
+        setHighlightedError(message)
+      }
+
       toast.error(message)
       setResult({
         success: false,
@@ -306,6 +347,17 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
         </CardContent>
       </Card>
 
+      {highlightedError ? (
+        <div className="max-w-2xl mx-auto">
+          <Alert className="border-black bg-white text-center text-black [&>svg]:text-black">
+            <AlertTitle className="text-base text-black">Palavra nao reconhecida</AlertTitle>
+            <AlertDescription className="justify-items-center text-sm text-black/90">
+              {highlightedError}
+            </AlertDescription>
+          </Alert>
+        </div>
+      ) : null}
+
       {result?.success && result.translation ? (
         <Card>
           <CardHeader>
@@ -341,7 +393,7 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
             </div>
 
             <Button asChild>
-              <Link href="/dashboard/treinar">Ir para Treinar</Link>
+              <Link href={trainingHref}>Ir para Treinar</Link>
             </Button>
           </CardContent>
         </Card>

@@ -50,6 +50,14 @@ function normalizeLanguageCodeForStorage(languageCode: string) {
   return languageCode.trim().toLowerCase().split('-')[0]
 }
 
+function normalizeTextForComparison(text: string) {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+    .toLowerCase()
+}
+
 export async function GET() {
   try {
     const translator = createTranslator()
@@ -107,13 +115,28 @@ export async function POST(req: Request) {
     const deepLTargetLang = toDeepLTargetLang(targetLanguageCode)
     const deepLSourceLang = toDeepLSourceLang(sourceLanguageCode)
 
-    const result = await translator.translateText(
-      word,
-      deepLSourceLang as deepl.SourceLanguageCode | null,
-      deepLTargetLang as deepl.TargetLanguageCode
-    )
+    let result: deepl.TextResult | deepl.TextResult[]
+    try {
+      result = await translator.translateText(
+        word,
+        deepLSourceLang as deepl.SourceLanguageCode | null,
+        deepLTargetLang as deepl.TargetLanguageCode
+      )
+    } catch (translationError) {
+      console.error('Erro DeepL ao traduzir:', translationError)
 
-    const translatedText = Array.isArray(result) ? result[0]?.text : result.text
+      const message = translationError instanceof Error
+        ? translationError.message
+        : 'Falha ao traduzir com DeepL'
+
+      return Response.json(
+        { error: `Erro na traducao com DeepL: ${message}` },
+        { status: 502 }
+      )
+    }
+
+    const firstResult = Array.isArray(result) ? result[0] : result
+    const translatedText = firstResult?.text
 
     const translation = {
       translatedWord: translatedText,
@@ -126,6 +149,16 @@ export async function POST(req: Request) {
       return Response.json(
         { error: 'Falha ao traduzir a palavra' },
         { status: 500 }
+      )
+    }
+
+    const normalizedOriginalWord = normalizeTextForComparison(word)
+    const normalizedTranslatedWord = normalizeTextForComparison(translation.translatedWord)
+
+    if (normalizedOriginalWord === normalizedTranslatedWord) {
+      return Response.json(
+        { error: 'Nao foi possivel validar essa palavra para traducao. Tente outra palavra existente.' },
+        { status: 422 }
       )
     }
 
@@ -266,8 +299,13 @@ export async function POST(req: Request) {
     })
   } catch (error) {
     console.error('Erro na traducao:', error)
+
+    const message = error instanceof Error
+      ? error.message
+      : 'Erro interno do servidor'
+
     return Response.json(
-      { error: 'Erro interno do servidor' },
+      { error: message },
       { status: 500 }
     )
   }

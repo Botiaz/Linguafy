@@ -11,16 +11,15 @@ import { Badge } from '@/components/ui/badge'
 import { FlashCard } from './flash-card'
 import { TrainingResults } from './training-results'
 import { toast } from 'sonner'
-import { Play, Filter, Shuffle, RotateCcw } from 'lucide-react'
-import type { Language, Category, Word, UserVocabulary } from '@/lib/types'
+import { Play, Shuffle, RotateCcw } from 'lucide-react'
+import type { Language, Word, UserVocabulary } from '@/lib/types'
 
 interface TrainingAreaProps {
-  languages: (Language & { categories: Category[] })[]
+  languages: Language[]
   words: Word[]
   userVocabulary: UserVocabulary[]
   userId: string
   initialLanguage?: string
-  initialCategory?: string
 }
 
 interface TrainingState {
@@ -37,11 +36,9 @@ export function TrainingArea({
   userVocabulary,
   userId,
   initialLanguage,
-  initialCategory,
 }: TrainingAreaProps) {
   const router = useRouter()
   const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage || '')
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory || '')
   const [trainingState, setTrainingState] = useState<TrainingState>({
     isTraining: false,
     currentIndex: 0,
@@ -51,14 +48,9 @@ export function TrainingArea({
   })
   const [showResults, setShowResults] = useState(false)
 
-  // Get categories for selected language
-  const selectedLang = languages.find(l => l.id === selectedLanguage)
-  const categories = selectedLang?.categories || []
-
   // Filter words based on selection
   const filteredWords = words.filter(word => {
     if (selectedLanguage && word.language_id !== selectedLanguage) return false
-    if (selectedCategory && word.category_id !== selectedCategory) return false
     return true
   })
 
@@ -67,18 +59,15 @@ export function TrainingArea({
 
   // Handle language change
   function handleLanguageChange(value: string) {
-    setSelectedLanguage(value)
-    setSelectedCategory('')
-    router.push(`/dashboard/treinar?language=${value}`)
-  }
+    const language = value === 'all' ? '' : value
+    setSelectedLanguage(language)
 
-  // Handle category change
-  function handleCategoryChange(value: string) {
-    setSelectedCategory(value)
-    const params = new URLSearchParams()
-    if (selectedLanguage) params.set('language', selectedLanguage)
-    if (value && value !== 'all') params.set('category', value)
-    router.push(`/dashboard/treinar?${params.toString()}`)
+    if (language) {
+      router.push(`/dashboard/treinar?language=${language}`)
+      return
+    }
+
+    router.push('/dashboard/treinar')
   }
 
   // Shuffle and start training
@@ -162,7 +151,7 @@ export function TrainingArea({
         .insert({
           user_id: userId,
           language_id: selectedLanguage || trainingState.cards[0]?.language_id,
-          category_id: selectedCategory || null,
+          category_id: null,
           total_words: trainingState.cards.length,
           correct_answers: correctAnswers,
           duration_seconds: duration,
@@ -183,7 +172,7 @@ export function TrainingArea({
         answers: newAnswers,
       }))
     }
-  }, [trainingState, vocabMap, userId, selectedLanguage, selectedCategory])
+  }, [trainingState, vocabMap, userId, selectedLanguage])
 
   // Reset training
   function resetTraining() {
@@ -257,47 +246,24 @@ export function TrainingArea({
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="w-5 h-5" />
-            Configurar Treino
-          </CardTitle>
+          <CardTitle>Treino</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Idioma</label>
-              <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+              <Select value={selectedLanguage || 'all'} onValueChange={handleLanguageChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione um idioma" />
+                  <SelectValue placeholder="Todos os idiomas" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="all">Todos os idiomas</SelectItem>
                   {languages.map(lang => (
                     <SelectItem key={lang.id} value={lang.id}>
                       <span className="flex items-center gap-2">
                         <span>{lang.flag_emoji}</span>
                         <span>{lang.name}</span>
                       </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Categoria</label>
-              <Select 
-                value={selectedCategory} 
-                onValueChange={handleCategoryChange}
-                disabled={!selectedLanguage}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Todas as categorias" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as categorias</SelectItem>
-                  {categories.map(cat => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -371,8 +337,8 @@ export function TrainingArea({
             <h3 className="font-semibold text-foreground mb-2">Nenhuma palavra encontrada</h3>
             <p className="text-sm text-muted-foreground">
               {selectedLanguage 
-                ? 'Selecione outra categoria ou aguarde novas palavras serem adicionadas.'
-                : 'Selecione um idioma para ver as palavras disponiveis.'}
+                ? 'Nao ha palavras para este idioma no momento.'
+                : 'Nao ha palavras disponiveis para treino no momento.'}
             </p>
           </CardContent>
         </Card>
