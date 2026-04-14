@@ -56,7 +56,7 @@ export default async function AdminPage() {
   ]
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 md:space-y-12">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Administracao</h1>
         <p className="text-muted-foreground mt-1">
@@ -64,10 +64,10 @@ export default async function AdminPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-7 md:grid-cols-2">
         {adminItems.map((item) => (
           <Link key={item.href} href={item.href}>
-            <Card className="hover:border-primary/30 transition-colors h-full">
+            <Card className="h-full bg-card/95 transition-all duration-200 hover:border-primary/35 hover:shadow-md">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">

@@ -23,7 +23,7 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-background">
       <DashboardNav user={user} profile={profile} />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-12 animate-in fade-in duration-200">
         {children}
       </main>
     </div>

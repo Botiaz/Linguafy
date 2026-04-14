@@ -71,15 +71,16 @@ export function HeroAnimation() {
 
   return (
     <section ref={sectionRef} className="hero-scroll relative h-[300vh] bg-background">
-      <div className="hero-sticky sticky top-0 flex h-screen items-center justify-center overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_65%,rgba(99,102,241,0.22),transparent_70%)]" />
+      <div className="hero-sticky sticky top-0 flex min-h-[100dvh] items-center justify-center overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1100px_520px_at_50%_0%,hsl(var(--primary)/0.14),transparent_65%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_65%,hsl(var(--accent)/0.10),transparent_72%)]" />
 
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl flex-col items-center justify-center px-4 [perspective:1000px]">
-          <div ref={textGroupRef} className="mb-10 text-center transition-opacity duration-150">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl flex-col items-center justify-center px-4 md:px-6 [perspective:1000px]">
+          <div ref={textGroupRef} className="mb-14 text-center transition-opacity duration-150 md:mb-16">
             <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
               Aprenda mais. Lembre mais.
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg md:text-xl">
+            <p className="mx-auto mt-5 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg md:text-xl">
               Flashcards inteligentes que transformam estudo em progresso real.
             </p>
             <button

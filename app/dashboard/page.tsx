@@ -40,7 +40,7 @@ export default async function DashboardPage() {
   const wordsDue = userVocabulary?.filter(v => !v.next_review || v.next_review <= now)?.length || 0
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 md:space-y-12">
       {/* Welcome Section */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
@@ -70,7 +70,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           icon={<BookOpen className="w-5 h-5" />}
           label="Palavras Aprendidas"
@@ -98,8 +98,8 @@ export default async function DashboardPage() {
       </div>
 
       {/* Languages Section */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
+      <div className="space-y-5">
+        <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-foreground">Idiomas Disponiveis</h2>
           <div className="flex items-center gap-2">
             <Link href="/dashboard/tradutor">
@@ -118,7 +118,7 @@ export default async function DashboardPage() {
         </div>
 
         {languages && languages.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
             {languages.map((language) => {
               const languageVocab = userVocabulary?.filter(v => v.word?.language_id === language.id) || []
               const progress = languageVocab.length > 0 
@@ -126,7 +126,7 @@ export default async function DashboardPage() {
                 : 0
 
               return (
-                <Card key={language.id} className="hover:border-primary/30 transition-colors">
+                <Card key={language.id} className="hover:border-primary/35 transition-all duration-200 hover:shadow-md">
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-3">
                       <span className="text-3xl">{language.flag_emoji}</span>
@@ -158,7 +158,7 @@ export default async function DashboardPage() {
             })}
           </div>
         ) : (
-          <Card>
+          <Card className="bg-card/95">
             <CardContent className="py-12 text-center">
               <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
                 <BookOpen className="w-8 h-8 text-muted-foreground" />
@@ -174,8 +174,8 @@ export default async function DashboardPage() {
 
       {/* Recent Activity */}
       {trainingSessions && trainingSessions.length > 0 && (
-        <div>
-          <h2 className="text-xl font-semibold text-foreground mb-4">Atividade Recente</h2>
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-foreground">Atividade Recente</h2>
           <Card>
             <CardContent className="p-0">
               <div className="divide-y divide-border">
@@ -213,9 +213,9 @@ export default async function DashboardPage() {
 
 function StatsCard({ icon, label, value, description }: { icon: React.ReactNode; label: string; value: string; description: string }) {
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center gap-3 mb-3">
+    <Card className="bg-card/95">
+      <CardContent className="p-7">
+        <div className="mb-4 flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
             {icon}
           </div>

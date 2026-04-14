@@ -55,7 +55,7 @@ export default async function TreinarPage({
     .eq('user_id', user?.id)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 md:space-y-10">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Treinar</h1>
         <p className="text-muted-foreground mt-1">

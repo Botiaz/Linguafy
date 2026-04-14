@@ -18,10 +18,10 @@ export default async function TradutorPage() {
     .order('name')
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 md:space-y-10">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Tradutor</h1>
-        <p className="text-muted-foreground">
+        <p className="mt-1 text-muted-foreground">
           Traduza com DeepL e salve automaticamente para treinar depois
         </p>
         {languagesError ? (

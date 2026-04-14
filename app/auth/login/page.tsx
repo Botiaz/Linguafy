@@ -41,7 +41,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background bg-[radial-gradient(900px_420px_at_50%_0%,hsl(var(--primary)/0.12),transparent_70%)] flex items-center justify-center p-4 md:p-6 animate-in fade-in duration-200">
       <div className="w-full max-w-md">
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
@@ -50,7 +50,7 @@ export default function LoginPage() {
           <span className="text-xl font-bold text-foreground">Linguafy</span>
         </Link>
 
-        <Card>
+        <Card className="bg-card/95 shadow-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
             <CardDescription>
