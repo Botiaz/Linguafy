@@ -306,7 +306,7 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
           </div>
 
           {sourceLanguages.length === 0 || targetLanguages.length === 0 ? (
-            <p className="text-sm text-amber-600">
+            <p className="text-sm text-warning">
               Nao foi possivel carregar idiomas. Verifique DEEPL_AUTH_KEY e a conexao com o Supabase.
             </p>
           ) : null}
@@ -349,9 +349,9 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
 
       {highlightedError ? (
         <div className="max-w-2xl mx-auto">
-          <Alert className="border-black bg-white text-center text-black [&>svg]:text-black">
-            <AlertTitle className="text-base text-black">Palavra nao reconhecida</AlertTitle>
-            <AlertDescription className="justify-items-center text-sm text-black/90">
+          <Alert className="border-border bg-card text-center text-card-foreground [&>svg]:text-card-foreground">
+            <AlertTitle className="text-base text-card-foreground">Palavra nao reconhecida</AlertTitle>
+            <AlertDescription className="justify-items-center text-sm text-muted-foreground">
               {highlightedError}
             </AlertDescription>
           </Alert>

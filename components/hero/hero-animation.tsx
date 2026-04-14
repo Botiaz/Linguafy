@@ -85,7 +85,7 @@ export function HeroAnimation() {
             </p>
             <button
               type="button"
-              className="mt-7 rounded-xl bg-card px-6 py-3 text-sm font-semibold text-foreground transition hover:opacity-90"
+              className="mt-7 rounded-xl bg-card px-6 py-3 text-sm font-semibold text-foreground transition-all duration-150 ease-out hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               Comecar agora
             </button>
@@ -97,11 +97,11 @@ export function HeroAnimation() {
               className="card absolute inset-0 rounded-[12px] [transform-style:preserve-3d]"
               style={{ transform: 'rotateY(0deg)' }}
             >
-              <div className="card-front absolute inset-0 flex items-center justify-center rounded-[12px] border border-border/70 bg-card px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.35)] [backface-visibility:hidden]">
+              <div className="card-front absolute inset-0 flex items-center justify-center rounded-[12px] border border-border/70 bg-card px-5 text-center shadow-[0_30px_60px_hsl(var(--background)/0.55)] [backface-visibility:hidden]">
                 <p className="text-xl font-semibold text-muted-foreground sm:text-2xl">O que e React?</p>
               </div>
 
-              <div className="card-back absolute inset-0 flex items-center justify-center rounded-[12px] bg-gradient-to-br from-primary to-accent px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.4)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+              <div className="card-back absolute inset-0 flex items-center justify-center rounded-[12px] bg-gradient-to-br from-primary to-accent px-5 text-center shadow-[0_30px_60px_hsl(var(--background)/0.6)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
                 <p className="text-lg font-semibold text-primary-foreground sm:text-2xl">
                   Uma biblioteca JavaScript para UIs
                 </p>
@@ -111,7 +111,7 @@ export function HeroAnimation() {
 
           <div
             ref={brainRef}
-            className="brain-icon absolute bottom-8 right-6 flex h-20 w-20 items-center justify-center rounded-full border border-[#8b5cf6]/70 bg-[#8b5cf6]/18 text-4xl shadow-[0_0_30px_rgba(139,92,246,0.45)] sm:bottom-10 sm:right-10"
+            className="brain-icon absolute bottom-8 right-6 flex h-20 w-20 items-center justify-center rounded-full border border-primary/60 bg-primary/20 text-4xl shadow-[0_0_30px_hsl(var(--primary)/0.45)] sm:bottom-10 sm:right-10"
           >
             🧠
           </div>
@@ -135,15 +135,15 @@ export function HeroAnimation() {
         @keyframes brainPulse {
           0% {
             transform: scale(1);
-            box-shadow: 0 0 24px rgba(139, 92, 246, 0.45);
+            box-shadow: 0 0 24px hsl(var(--primary) / 0.45);
           }
           50% {
             transform: scale(1.3);
-            box-shadow: 0 0 54px rgba(139, 92, 246, 0.75);
+            box-shadow: 0 0 54px hsl(var(--primary) / 0.75);
           }
           100% {
             transform: scale(1);
-            box-shadow: 0 0 24px rgba(139, 92, 246, 0.45);
+            box-shadow: 0 0 24px hsl(var(--primary) / 0.45);
           }
         }
       `}</style>

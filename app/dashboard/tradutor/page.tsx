@@ -25,7 +25,7 @@ export default async function TradutorPage() {
           Traduza com DeepL e salve automaticamente para treinar depois
         </p>
         {languagesError ? (
-          <p className="text-amber-600 mt-2 text-sm">
+          <p className="mt-2 text-sm text-warning">
             Aviso: nao foi possivel carregar idiomas do banco, usando lista da DeepL.
           </p>
         ) : null}
