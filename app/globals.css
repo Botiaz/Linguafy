@@ -41,6 +41,8 @@
   --success-foreground: oklch(0.99 0.005 275);
   --warning: oklch(0.75 0.18 80);
   --warning-foreground: oklch(0.20 0.02 80);
+  --danger: oklch(0.55 0.22 25);
+  --danger-foreground: oklch(0.99 0.005 275);
 }
 
 .dark {
@@ -80,6 +82,8 @@
   --success-foreground: oklch(0.99 0.005 275);
   --warning: oklch(0.75 0.18 80);
   --warning-foreground: oklch(0.20 0.02 80);
+  --danger: oklch(0.55 0.22 25);
+  --danger-foreground: oklch(0.99 0.005 275);
 }
 
 @theme inline {
@@ -125,6 +129,8 @@
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
   --shadow-xs: 0 1px 2px hsl(228 20% 6% / 0.24);
   --shadow-sm: 0 6px 20px hsl(228 20% 6% / 0.24);
   --shadow-md: 0 14px 34px hsl(228 22% 6% / 0.28);
@@ -164,8 +170,11 @@
 /*
   Altered files summary:
   - app/globals.css:
-    - Updated color palette tokens to a dark-first system with violet/blue accents.
-    - Tuned typography defaults (font stack fallback, heading tracking/line-height, paragraph rhythm).
-    - Increased global radius scale and introduced shadow tokens for a softer premium depth.
-    - Added global section spacing rhythm for lower visual density.
+    - Added semantic danger tokens and mapped them to Tailwind theme colors.
+  - components/hero/hero-animation.tsx:
+    - Replaced fixed color classes with theme tokens (background/card/foreground/muted/primary/accent).
+  - components/training/flash-card.tsx:
+    - Replaced fixed difficulty color scale with semantic token classes (success/warning/danger).
+  - components/admin/words-list.tsx:
+    - Replaced fixed difficulty color scale with semantic token classes (success/warning/danger).
 */

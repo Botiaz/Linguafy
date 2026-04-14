@@ -70,21 +70,21 @@ export function HeroAnimation() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="hero-scroll relative h-[300vh] bg-[#0f0f0f]">
+    <section ref={sectionRef} className="hero-scroll relative h-[300vh] bg-background">
       <div className="hero-sticky sticky top-0 flex h-screen items-center justify-center overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_65%,rgba(99,102,241,0.22),transparent_70%)]" />
 
         <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl flex-col items-center justify-center px-4 [perspective:1000px]">
           <div ref={textGroupRef} className="mb-10 text-center transition-opacity duration-150">
-            <h1 className="text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
+            <h1 className="text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
               Aprenda mais. Lembre mais.
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-zinc-300 sm:text-lg md:text-xl">
+            <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-muted-foreground sm:text-lg md:text-xl">
               Flashcards inteligentes que transformam estudo em progresso real.
             </p>
             <button
               type="button"
-              className="mt-7 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:opacity-90"
+              className="mt-7 rounded-xl bg-card px-6 py-3 text-sm font-semibold text-foreground transition hover:opacity-90"
             >
               Comecar agora
             </button>
@@ -96,12 +96,12 @@ export function HeroAnimation() {
               className="card absolute inset-0 rounded-[12px] [transform-style:preserve-3d]"
               style={{ transform: 'rotateY(0deg)' }}
             >
-              <div className="card-front absolute inset-0 flex items-center justify-center rounded-[12px] border border-white/20 bg-white px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.35)] [backface-visibility:hidden]">
-                <p className="text-xl font-semibold text-zinc-600 sm:text-2xl">O que e React?</p>
+              <div className="card-front absolute inset-0 flex items-center justify-center rounded-[12px] border border-border/70 bg-card px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.35)] [backface-visibility:hidden]">
+                <p className="text-xl font-semibold text-muted-foreground sm:text-2xl">O que e React?</p>
               </div>
 
-              <div className="card-back absolute inset-0 flex items-center justify-center rounded-[12px] bg-gradient-to-br from-[#6366f1] to-[#3b82f6] px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.4)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                <p className="text-lg font-semibold text-white sm:text-2xl">
+              <div className="card-back absolute inset-0 flex items-center justify-center rounded-[12px] bg-gradient-to-br from-primary to-accent px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.4)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
+                <p className="text-lg font-semibold text-primary-foreground sm:text-2xl">
                   Uma biblioteca JavaScript para UIs
                 </p>
               </div>
