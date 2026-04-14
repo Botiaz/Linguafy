@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { HeroAnimation } from '@/components/hero/hero-animation'
 import { BookOpen, Brain, Globe, Sparkles, Target, Zap } from 'lucide-react'
 
 export default function LandingPage() {
@@ -13,7 +14,7 @@ export default function LandingPage() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground">LinguaFlash</span>
+            <span className="text-xl font-bold text-foreground">Linguafy</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6">
             <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -35,37 +36,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 md:py-32">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
-              Aprenda idiomas de forma inteligente
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight text-balance">
-              Domine novos idiomas com{' '}
-              <span className="text-primary">flashcards inteligentes</span>
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto text-pretty">
-              Use o poder da repeticao espacada para memorizar vocabulario de forma eficiente. 
-              Treine no seu ritmo e acompanhe seu progresso em tempo real.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/auth/sign-up">
-                <Button size="lg" className="gap-2">
-                  <Zap className="w-5 h-5" />
-                  Comecar Agora
-                </Button>
-              </Link>
-              <Link href="#how-it-works">
-                <Button size="lg" variant="outline">
-                  Saiba Mais
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroAnimation />
 
       {/* Features Section */}
       <section id="features" className="py-20 bg-muted/30">
@@ -151,7 +122,7 @@ export default function LandingPage() {
             Pronto para comecar?
           </h2>
           <p className="text-primary-foreground/80 text-lg mb-8 max-w-2xl mx-auto">
-            Junte-se a milhares de estudantes que ja estao aprendendo novos idiomas com LinguaFlash.
+            Junte-se a milhares de estudantes que ja estao aprendendo novos idiomas com Linguafy.
           </p>
           <Link href="/auth/sign-up">
             <Button size="lg" variant="secondary" className="gap-2">
@@ -170,10 +141,10 @@ export default function LandingPage() {
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <BookOpen className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="font-semibold text-foreground">LinguaFlash</span>
+              <span className="font-semibold text-foreground">Linguafy</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              2024 LinguaFlash. Todos os direitos reservados.
+              2024 Linguafy. Todos os direitos reservados.
             </p>
           </div>
         </div>

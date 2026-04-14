@@ -15,7 +15,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'LinguaFlash - Aprenda Idiomas com Flashcards',
+  title: 'Linguafy - Aprenda Idiomas com Flashcards',
   description: 'Plataforma de estudo de idiomas com flashcards inteligentes e revisao espacada',
   generator: 'v0.app',
   icons: {
