@@ -70,7 +70,7 @@ export default function ConfiguracoesPage() {
   }
 
   return (
-    <div className="max-w-3xl space-y-8 md:space-y-10">
+    <div className="space-y-6 max-w-2xl">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Configuracoes</h1>
         <p className="text-muted-foreground mt-1">
@@ -78,14 +78,14 @@ export default function ConfiguracoesPage() {
         </p>
       </div>
 
-      <Card className="bg-card/95">
+      <Card>
         <CardHeader>
           <CardTitle>Perfil</CardTitle>
           <CardDescription>
             Atualize suas informacoes pessoais
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-7">
+        <CardContent className="space-y-6">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20">
               <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || 'User'} />
@@ -129,7 +129,7 @@ export default function ConfiguracoesPage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-card/95">
+      <Card>
         <CardHeader>
           <CardTitle>Estatisticas</CardTitle>
           <CardDescription>

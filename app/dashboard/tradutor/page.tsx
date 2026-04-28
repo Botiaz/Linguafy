@@ -18,14 +18,14 @@ export default async function TradutorPage() {
     .order('name')
 
   return (
-    <div className="space-y-8 md:space-y-10">
+    <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Tradutor</h1>
-        <p className="mt-1 text-muted-foreground">
+        <p className="text-muted-foreground">
           Traduza com DeepL e salve automaticamente para treinar depois
         </p>
         {languagesError ? (
-          <p className="mt-2 text-sm text-warning">
+          <p className="text-amber-600 mt-2 text-sm">
             Aviso: nao foi possivel carregar idiomas do banco, usando lista da DeepL.
           </p>
         ) : null}

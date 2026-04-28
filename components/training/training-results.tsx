@@ -28,7 +28,7 @@ export function TrainingResults({
   
   if (accuracy >= 90) {
     performanceMessage = 'Excelente! Voce esta dominando!'
-    performanceIcon = <Trophy className="w-8 h-8 text-warning" />
+    performanceIcon = <Trophy className="w-8 h-8 text-yellow-500" />
   } else if (accuracy >= 70) {
     performanceMessage = 'Muito bem! Continue praticando!'
     performanceIcon = <Star className="w-8 h-8 text-primary" />
