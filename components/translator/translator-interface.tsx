@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Languages, Loader2, Save, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
@@ -51,8 +51,259 @@ interface LanguageOption {
   id: string
   name: string
   code: string
-  flag_emoji: string
+  flag_code: string | null
   databaseId?: string
+}
+
+const FLAG_BY_CODE: Record<string, string> = {
+  de: 'DE',
+  ko: 'KR',
+  es: 'ES',
+  fr: 'FR',
+  en: 'GB',
+  'en-gb': 'GB',
+  'en-us': 'US',
+  it: 'IT',
+  ja: 'JP',
+  pt: 'BR',
+  'pt-br': 'BR',
+  'pt-pt': 'PT',
+  zh: 'CN',
+  'zh-cn': 'CN',
+  'zh-hans': 'CN',
+  'zh-hant': 'TW',
+  'zh-tw': 'TW',
+}
+
+const FLAG_BY_NAME: Record<string, string> = {
+  alemao: 'DE',
+  coreano: 'KR',
+  espanhol: 'ES',
+  frances: 'FR',
+  ingles: 'GB',
+  italiano: 'IT',
+  japones: 'JP',
+  mandarim: 'CN',
+  portugues: 'BR',
+}
+
+function normalizeName(value: string) {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+}
+
+function resolveFlagCode({ code, name }: { code: string; name: string }) {
+  const normalizedCode = code.toLowerCase()
+  const baseCode = normalizedCode.split('-')[0]
+  const normalizedName = normalizeName(name)
+
+  return (
+    FLAG_BY_CODE[normalizedCode] ||
+    FLAG_BY_CODE[baseCode] ||
+    FLAG_BY_NAME[normalizedName] ||
+    null
+  )
+}
+
+type FlagBaseProps = {
+  className?: string
+  children: ReactNode
+}
+
+type FlagProps = {
+  className?: string
+}
+
+const FLAG_BASE_CLASS =
+  'h-4 w-6 shrink-0 overflow-hidden rounded-[2px] border border-border/60'
+
+function FlagBase({ className, children }: FlagBaseProps) {
+  return (
+    <svg
+      viewBox="0 0 20 14"
+      className={`${FLAG_BASE_CLASS}${className ? ` ${className}` : ''}`}
+      aria-hidden="true"
+      focusable="false"
+    >
+      {children}
+    </svg>
+  )
+}
+
+function FlagDE({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#000000" />
+      <rect y="4.6667" width="20" height="4.6667" fill="#DD0000" />
+      <rect y="9.3334" width="20" height="4.6667" fill="#FFCE00" />
+    </FlagBase>
+  )
+}
+
+function FlagKR({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#FFFFFF" />
+      <path d="M10 3.5a3.5 3.5 0 1 1 0 7a3.5 3.5 0 0 0 0-7z" fill="#C60C30" />
+      <path d="M10 3.5a3.5 3.5 0 0 0 0 7a3.5 3.5 0 0 1 0-7z" fill="#003478" />
+    </FlagBase>
+  )
+}
+
+function FlagES({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#AA151B" />
+      <rect y="3.5" width="20" height="7" fill="#F1BF00" />
+      <rect y="10.5" width="20" height="3.5" fill="#AA151B" />
+    </FlagBase>
+  )
+}
+
+function FlagFR({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="6.6667" height="14" fill="#0055A4" />
+      <rect x="6.6667" width="6.6667" height="14" fill="#FFFFFF" />
+      <rect x="13.3334" width="6.6667" height="14" fill="#EF4135" />
+    </FlagBase>
+  )
+}
+
+function FlagGB({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#012169" />
+      <path
+        d="M0 0L20 14M20 0L0 14"
+        stroke="#FFFFFF"
+        strokeWidth="4"
+        strokeLinecap="square"
+      />
+      <path
+        d="M0 0L20 14M20 0L0 14"
+        stroke="#C8102E"
+        strokeWidth="2"
+        strokeLinecap="square"
+      />
+      <rect x="8" width="4" height="14" fill="#FFFFFF" />
+      <rect y="5" width="20" height="4" fill="#FFFFFF" />
+      <rect x="9" width="2" height="14" fill="#C8102E" />
+      <rect y="6" width="20" height="2" fill="#C8102E" />
+    </FlagBase>
+  )
+}
+
+function FlagUS({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#FFFFFF" />
+      <rect y="0" width="20" height="1" fill="#B22234" />
+      <rect y="2" width="20" height="1" fill="#B22234" />
+      <rect y="4" width="20" height="1" fill="#B22234" />
+      <rect y="6" width="20" height="1" fill="#B22234" />
+      <rect y="8" width="20" height="1" fill="#B22234" />
+      <rect y="10" width="20" height="1" fill="#B22234" />
+      <rect y="12" width="20" height="1" fill="#B22234" />
+      <rect width="8" height="7" fill="#3C3B6E" />
+    </FlagBase>
+  )
+}
+
+function FlagIT({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="6.6667" height="14" fill="#008C45" />
+      <rect x="6.6667" width="6.6667" height="14" fill="#FFFFFF" />
+      <rect x="13.3334" width="6.6667" height="14" fill="#CD212A" />
+    </FlagBase>
+  )
+}
+
+function FlagJP({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#FFFFFF" />
+      <circle cx="10" cy="7" r="4" fill="#BC002D" />
+    </FlagBase>
+  )
+}
+
+function FlagCN({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#DE2910" />
+      <polygon
+        points="4,1.6 4.7,3.5 6.8,3.5 5.1,4.7 5.8,6.6 4,5.4 2.2,6.6 2.9,4.7 1.2,3.5 3.3,3.5"
+        fill="#FFDE00"
+      />
+    </FlagBase>
+  )
+}
+
+function FlagTW({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#FE0000" />
+      <rect width="8" height="6" fill="#000095" />
+      <circle cx="4" cy="3" r="1.5" fill="#FFFFFF" />
+    </FlagBase>
+  )
+}
+
+function FlagPT({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="8" height="14" fill="#006600" />
+      <rect x="8" width="12" height="14" fill="#FF0000" />
+    </FlagBase>
+  )
+}
+
+function FlagBR({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#009B3A" />
+      <polygon points="10,1.5 18.5,7 10,12.5 1.5,7" fill="#FFDF00" />
+      <circle cx="10" cy="7" r="2.5" fill="#002776" />
+    </FlagBase>
+  )
+}
+
+function FlagGeneric({ className }: FlagProps) {
+  return (
+    <FlagBase className={className}>
+      <rect width="20" height="14" fill="#CBD5E1" />
+      <path d="M0 0L20 14M20 0L0 14" stroke="#94A3B8" strokeWidth="2" />
+    </FlagBase>
+  )
+}
+
+const FLAG_COMPONENTS: Record<string, (props: FlagProps) => JSX.Element> = {
+  BR: FlagBR,
+  CN: FlagCN,
+  DE: FlagDE,
+  ES: FlagES,
+  FR: FlagFR,
+  GB: FlagGB,
+  IT: FlagIT,
+  JP: FlagJP,
+  KR: FlagKR,
+  PT: FlagPT,
+  TW: FlagTW,
+  US: FlagUS,
+}
+
+function FlagIcon({ code, className }: { code?: string | null; className?: string }) {
+  const normalized = code ? code.toUpperCase() : ''
+  const Flag = normalized ? FLAG_COMPONENTS[normalized] : undefined
+
+  if (!Flag) return <FlagGeneric className={className} />
+
+  return <Flag className={className} />
 }
 
 function matchesSupportedLanguage(code: string, supportedCodes: string[]) {
@@ -121,7 +372,10 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
       databaseId: language.id,
       name: language.name,
       code: language.code,
-      flag_emoji: language.flag_emoji || '🌐',
+      flag_code: resolveFlagCode({
+        code: language.code,
+        name: language.name,
+      }),
     }))
   }, [languages])
 
@@ -130,7 +384,10 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
       id: `deepl-source-${language.code}`,
       name: language.name,
       code: language.code,
-      flag_emoji: '🌐',
+      flag_code: resolveFlagCode({
+        code: language.code,
+        name: language.name,
+      }),
     }))
   }, [deepLSourceLanguages])
 
@@ -139,7 +396,10 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
       id: `deepl-target-${language.code}`,
       name: language.name,
       code: language.code,
-      flag_emoji: '🌐',
+      flag_code: resolveFlagCode({
+        code: language.code,
+        name: language.name,
+      }),
     }))
   }, [deepLTargetLanguages])
 
@@ -270,13 +530,20 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
               <Label htmlFor="source-language">Idioma de origem</Label>
               <Select value={sourceLanguageId} onValueChange={setSourceLanguageId}>
                 <SelectTrigger id="source-language">
-                  <SelectValue placeholder="Selecione o idioma de origem" />
+                  {sourceLanguage ? (
+                    <span className="flex items-center gap-2">
+                      <FlagIcon code={sourceLanguage.flag_code} />
+                      <span>{sourceLanguage.name}</span>
+                    </span>
+                  ) : (
+                    <SelectValue placeholder="Selecione o idioma de origem" />
+                  )}
                 </SelectTrigger>
                 <SelectContent>
                   {sourceLanguages.map((language) => (
                     <SelectItem key={language.id} value={language.id}>
                       <span className="flex items-center gap-2">
-                        <span>{language.flag_emoji}</span>
+                        <FlagIcon code={language.flag_code} />
                         <span>{language.name}</span>
                       </span>
                     </SelectItem>
@@ -289,13 +556,20 @@ export function TranslatorInterface({ languages, userId }: TranslatorInterfacePr
               <Label htmlFor="target-language">Idioma de destino</Label>
               <Select value={targetLanguageId} onValueChange={setTargetLanguageId}>
                 <SelectTrigger id="target-language">
-                  <SelectValue placeholder="Selecione o idioma de destino" />
+                  {targetLanguage ? (
+                    <span className="flex items-center gap-2">
+                      <FlagIcon code={targetLanguage.flag_code} />
+                      <span>{targetLanguage.name}</span>
+                    </span>
+                  ) : (
+                    <SelectValue placeholder="Selecione o idioma de destino" />
+                  )}
                 </SelectTrigger>
                 <SelectContent>
                   {targetLanguages.map((language) => (
                     <SelectItem key={language.id} value={language.id}>
                       <span className="flex items-center gap-2">
-                        <span>{language.flag_emoji}</span>
+                        <FlagIcon code={language.flag_code} />
                         <span>{language.name}</span>
                       </span>
                     </SelectItem>
