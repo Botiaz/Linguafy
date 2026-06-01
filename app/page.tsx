@@ -1,8 +1,9 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { HeroAnimation } from '@/components/hero/hero-animation'
-import { BookOpen, Brain, Globe, Sparkles, Target, Zap } from 'lucide-react'
+import { BookOpen, Zap } from 'lucide-react'
 
 export default function LandingPage() {
   return (
@@ -51,32 +52,74 @@ export default function LandingPage() {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard
-              icon={<Brain className="w-6 h-6" />}
+              icon={
+                <Image
+                  src="/icons/landing/repeticao-espacada.svg"
+                  alt="Repeticao espaçada"
+                  width={32}
+                  height={32}
+                />
+              }
               title="Repeticao Espacada"
               description="Algoritmo inteligente que apresenta as palavras no momento ideal para maximizar a memorizacao."
             />
             <FeatureCard
-              icon={<Globe className="w-6 h-6" />}
+              icon={
+                <Image
+                  src="/icons/landing/multiplos-idiomas.svg"
+                  alt="Multiplos idiomas"
+                  width={32}
+                  height={32}
+                />
+              }
               title="Multiplos Idiomas"
               description="Aprenda ingles, espanhol, frances, alemao e muito mais com nosso catalogo em expansao."
             />
             <FeatureCard
-              icon={<Target className="w-6 h-6" />}
+              icon={
+                <Image
+                  src="/icons/landing/categorias-tematicas.svg"
+                  alt="Categorias tematicas"
+                  width={32}
+                  height={32}
+                />
+              }
               title="Categorias Tematicas"
               description="Estude por temas como viagens, negocios, cotidiano e muito mais."
             />
             <FeatureCard
-              icon={<Zap className="w-6 h-6" />}
+              icon={
+                <Image
+                  src="/icons/landing/treino-rapido.svg"
+                  alt="Treino rapido"
+                  width={32}
+                  height={32}
+                />
+              }
               title="Treino Rapido"
               description="Sessoes curtas e focadas que se encaixam na sua rotina diaria."
             />
             <FeatureCard
-              icon={<BookOpen className="w-6 h-6" />}
+              icon={
+                <Image
+                  src="/icons/landing/exemplos-contextuais.svg"
+                  alt="Exemplos contextuais"
+                  width={32}
+                  height={32}
+                />
+              }
               title="Exemplos Contextuais"
               description="Cada palavra vem com pronuncia e exemplos de uso em frases reais."
             />
             <FeatureCard
-              icon={<Sparkles className="w-6 h-6" />}
+              icon={
+                <Image
+                  src="/icons/landing/acompanhamento-do-progresso.svg"
+                  alt="Acompanhamento de progresso"
+                  width={32}
+                  height={32}
+                />
+              }
               title="Acompanhamento de Progresso"
               description="Estatisticas detalhadas para voce ver sua evolucao ao longo do tempo."
             />
