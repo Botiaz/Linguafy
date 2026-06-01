@@ -62,12 +62,12 @@ export function HeroAnimation() {
             <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-zinc-300 sm:text-lg md:text-xl">
               Flashcards inteligentes que transformam estudo em progresso real.
             </p>
-            <button
-              type="button"
-              className="mt-7 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:opacity-90"
+            <a
+              href="/auth/login"
+              className="mt-7 inline-flex rounded-xl bg-white px-6 py-3 text-sm font-semibold text-zinc-900 transition hover:opacity-90"
             >
               Comecar agora
-            </button>
+            </a>
           </div>
 
           <div className="card-scene relative h-[180px] w-[280px] [perspective:1000px] sm:h-[200px] sm:w-[320px]">
