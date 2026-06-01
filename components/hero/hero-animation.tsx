@@ -9,54 +9,34 @@ function clamp(value: number, min = 0, max = 1) {
 export function HeroAnimation() {
   const sectionRef = useRef<HTMLElement>(null)
   const textGroupRef = useRef<HTMLDivElement>(null)
-  const cardRef = useRef<HTMLDivElement>(null)
-  const brainRef = useRef<HTMLDivElement>(null)
+  const cardFrontRef = useRef<HTMLDivElement>(null)
+  const cardBackRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function updateAnimation() {
       const section = sectionRef.current
       const textGroup = textGroupRef.current
-      const card = cardRef.current
-      const brain = brainRef.current
+      const cardFront = cardFrontRef.current
+      const cardBack = cardBackRef.current
 
-      if (!section || !textGroup || !card || !brain) return
+      if (!section || !textGroup || !cardFront || !cardBack) return
 
       const localScroll = window.scrollY - section.offsetTop
       const maxScroll = section.offsetHeight - window.innerHeight
       const progress = clamp(localScroll / maxScroll)
 
-      const phaseOne = clamp(progress / 0.4)
-      const phaseTwo = clamp((progress - 0.4) / 0.6)
+      const phaseOne = clamp(progress / 0.6)
 
       const rotateY = phaseOne * 180
 
-      const cardRect = card.getBoundingClientRect()
-      const brainRect = brain.getBoundingClientRect()
-
-      const cardCenterX = cardRect.left + cardRect.width / 2
-      const cardCenterY = cardRect.top + cardRect.height / 2
-      const brainCenterX = brainRect.left + brainRect.width / 2
-      const brainCenterY = brainRect.top + brainRect.height / 2
-
-      const deltaX = brainCenterX - cardCenterX
-      const deltaY = brainCenterY - cardCenterY
-
-      const translateX = deltaX * phaseTwo
-      const translateY = deltaY * phaseTwo
-      const scale = 1 - 0.9 * phaseTwo
-      const cardOpacity = phaseTwo > 0.88 ? 1 - (phaseTwo - 0.88) / 0.12 : 1
-
       const textOpacity = 1 - phaseOne
+      const showBack = rotateY >= 90
 
       textGroup.style.opacity = `${clamp(textOpacity)}`
-      card.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale}) rotateY(${rotateY}deg)`
-      card.style.opacity = `${clamp(cardOpacity)}`
-
-      if (progress >= 0.92) {
-        brain.classList.add('brain-pulse')
-      } else {
-        brain.classList.remove('brain-pulse')
-      }
+      cardFront.style.transform = `rotateY(${rotateY}deg)`
+      cardBack.style.transform = `rotateY(${rotateY - 180}deg)`
+      cardFront.style.opacity = showBack ? '0' : '1'
+      cardBack.style.opacity = showBack ? '1' : '0'
     }
 
     updateAnimation()
@@ -70,7 +50,7 @@ export function HeroAnimation() {
   }, [])
 
   return (
-    <section ref={sectionRef} className="hero-scroll relative h-[300vh] bg-[#0f0f0f]">
+    <section ref={sectionRef} className="hero-scroll relative h-[220vh] bg-[#0f0f0f]">
       <div className="hero-sticky sticky top-0 flex h-screen items-center justify-center overflow-hidden">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_420px_at_50%_65%,rgba(99,102,241,0.22),transparent_70%)]" />
 
@@ -92,58 +72,39 @@ export function HeroAnimation() {
 
           <div className="card-scene relative h-[180px] w-[280px] [perspective:1000px] sm:h-[200px] sm:w-[320px]">
             <div
-              ref={cardRef}
-              className="card absolute inset-0 rounded-[12px] [transform-style:preserve-3d]"
-              style={{ transform: 'rotateY(0deg)' }}
+              className="card absolute inset-0 rounded-[12px]"
             >
-              <div className="card-front absolute inset-0 flex items-center justify-center rounded-[12px] border border-white/20 bg-white px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.35)] [backface-visibility:hidden]">
-                <p className="text-xl font-semibold text-zinc-600 sm:text-2xl">O que e React?</p>
+              <div
+                ref={cardFrontRef}
+                className="card-face card-front absolute inset-0 flex items-center justify-center rounded-[12px] border border-white/20 bg-white px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.35)]"
+              >
+                <p className="text-xl font-semibold text-zinc-600 sm:text-2xl">Bem vindo</p>
               </div>
 
-              <div className="card-back absolute inset-0 flex items-center justify-center rounded-[12px] bg-gradient-to-br from-[#6366f1] to-[#3b82f6] px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.4)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                <p className="text-lg font-semibold text-white sm:text-2xl">
-                  Uma biblioteca JavaScript para UIs
-                </p>
+              <div
+                ref={cardBackRef}
+                className="card-face card-back absolute inset-0 flex items-center justify-center rounded-[12px] bg-gradient-to-br from-[#6366f1] to-[#3b82f6] px-5 text-center shadow-[0_30px_60px_rgba(0,0,0,0.4)]"
+              >
+                <p className="text-lg font-semibold text-white sm:text-2xl">Welcome</p>
               </div>
             </div>
           </div>
 
-          <div
-            ref={brainRef}
-            className="brain-icon absolute bottom-8 right-6 flex h-20 w-20 items-center justify-center rounded-full border border-[#8b5cf6]/70 bg-[#8b5cf6]/18 text-4xl shadow-[0_0_30px_rgba(139,92,246,0.45)] sm:bottom-10 sm:right-10"
-          >
-            🧠
-          </div>
         </div>
       </div>
 
       <style jsx>{`
         .card {
           transition: opacity 120ms linear;
+          transform-style: preserve-3d;
           will-change: transform, opacity;
         }
 
-        .brain-icon {
-          transition: transform 220ms ease, box-shadow 220ms ease;
-        }
-
-        .brain-pulse {
-          animation: brainPulse 760ms ease-in-out infinite;
-        }
-
-        @keyframes brainPulse {
-          0% {
-            transform: scale(1);
-            box-shadow: 0 0 24px rgba(139, 92, 246, 0.45);
-          }
-          50% {
-            transform: scale(1.3);
-            box-shadow: 0 0 54px rgba(139, 92, 246, 0.75);
-          }
-          100% {
-            transform: scale(1);
-            box-shadow: 0 0 24px rgba(139, 92, 246, 0.45);
-          }
+        .card-face {
+          transition: opacity 120ms linear;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+          transform-style: preserve-3d;
         }
       `}</style>
     </section>
